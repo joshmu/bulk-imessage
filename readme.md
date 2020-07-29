@@ -13,7 +13,7 @@ At the project root folder:
 `node ./app.js` or `npm start`
 
 Optionally you can specify message **attachment** location and **contacts** list location on start.
-`node ./app.js ./attachement.gif ./contacts.txt`
+`node ./app.js ./attachment.gif ./contacts.txt`
 
 ### Other
 

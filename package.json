@@ -2,14 +2,21 @@
   "name": "bulk-imessage",
   "version": "1.0.0",
   "description": "Send imessages to multiple users.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "imessage",
+    "osascript",
+    "joshmu",
+    "attachment",
+    "nodejs"
+  ],
+  "author": "josh mu",
+  "license": "MIT",
   "dependencies": {
-    "osa-imessage": "git+https://git@github.com/elliotaplant/osa-imessage.git"
+    "is-valid-path": "^0.1.1",
+    "osa2": "^0.2.3"
   }
 }

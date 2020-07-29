@@ -16,39 +16,22 @@ const handleForName = name => {
 
 /**
  * Sends a message to the given handle
- * @param {string} handle
- * @param {string} messageOrFilePath
+ * @param {{handle: string, message: string, isFile: boolean}}
  */
-const send = (handle, messageOrFilePath) => {
+const send = ({ handle, message, isFile = false }) => {
   assert(typeof handle == 'string', 'handle must be a string')
-  assert(typeof messageOrFilePath == 'string', 'message/file must be a string')
+  assert(typeof message == 'string', 'message/file must be a string')
 
-  return sendMessageOrFile(
-    handle,
-    messageOrFilePath,
-    isValidPath(messageOrFilePath)
-  )
-}
-
-/**
- * Sends the file at the filepath to the given handle
- * @param {string} handle
- * @param {string} filepath
- */
-const sendFile = (handle, filepath) => {
-  assert(typeof handle == 'string', 'handle must be a string')
-  assert(typeof filepath == 'string', 'filepath must be a string')
-
-  return sendMessageOrFile(handle, filepath, true)
+  return sendMessageOrFile(handle, message, isFile)
 }
 
 /**
  * Handles sending a filepath or a message to a given handle
  * @param {string} handle
  * @param {string} messageOrFilepath
- * @param {boolean} [isFile = false]
+ * @param {boolean} isFile
  */
-const sendMessageOrFile = (handle, messageOrFilepath, isFile = false) => {
+const sendMessageOrFile = (handle, messageOrFilepath, isFile) => {
   return osa((handle, messageOrFilepath, isFile) => {
     // @ts-ignore
     const Messages = Application('Messages')
@@ -92,6 +75,5 @@ const assert = (valid, msg) => {
 
 module.exports = {
   send,
-  sendFile,
   handleForName,
 }

@@ -1,13 +1,44 @@
+const fs = require('fs')
 const imessage = require('./osa-imessage')
 
+const message = process.argv[2] || './attachment.gif'
+const contactsPath = process.argv[3] || './contacts.txt'
+
+/**
+ * get contacts
+ * @param {string} filePath file path
+ */
+const getContacts = filePath => {
+  const txt = fs.readFileSync(filePath, 'utf8')
+  const contacts = txt
+    .split('\n')
+    .filter(row => row.length)
+    .map(contact => contact.trim())
+  return contacts
+}
+
 ;(async () => {
-  // phone number, email, or group chat id
-  await imessage.send('+61422669427', 'hello')
+  // retrieve contacts
+  const contacts = getContacts(contactsPath)
+  let invalidContacts = []
 
-  const myHandle = await imessage.handleForName('josh mu')
-  console.log({ myHandle })
+  // send message per contact
+  for (let contact of contacts) {
+    // phone number, email, or group chat id
+    try {
+      await imessage.send({
+        handle: contact,
+        message: message,
+        isFile: true,
+      })
+    } catch (error) {
+      invalidContacts.push(contact)
+    }
+  }
 
-  // imessage.listen().on('message', msg => {
-  //   console.log(`${msg.text} from ${msg.handle}`)
-  // })
+  // display any errors
+  if (invalidContacts.length) {
+    fs.writeFileSync('./invalidContacts.txt', invalidContacts.join('\n'))
+    console.error('INVALID CONTACTS', invalidContacts)
+  }
 })()

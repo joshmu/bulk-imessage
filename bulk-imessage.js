@@ -1,16 +1,3 @@
-const MESSAGES_TO_SEND = [
-  {
-    message: 'first message ⚡️',
-  },
-  {
-    message: './attachment.gif',
-    isFile: true,
-  },
-  {
-    message: 'third message 👾',
-  },
-]
-
 /**
  * @file Main File to send bulk imessages
  *
@@ -22,8 +9,6 @@ const MESSAGES_TO_SEND = [
 
 const fs = require('fs')
 const imessage = require('./osa-imessage')
-
-const contactsPath = process.argv[2] || './contacts.txt'
 
 /**
  * get contacts
@@ -72,14 +57,14 @@ const sendMessage = async ({
 const uniqueArr = list =>
   list.filter((item, index, self) => self.indexOf(item) === index)
 
-;(async () => {
+const bulkImessage = async ({ messages, contactsPath = './contacts.txt' }) => {
   // retrieve contacts
   const contacts = getContacts(contactsPath)
   let invalidContacts = []
 
   // send message per contact
   for (let contact of contacts) {
-    for (let msg of MESSAGES_TO_SEND) {
+    for (let msg of messages) {
       try {
         await sendMessage({ contact, ...msg })
       } catch (error) {
@@ -97,4 +82,6 @@ const uniqueArr = list =>
     fs.writeFileSync('./invalidContacts.txt', invalidContacts.join('\n'))
     console.error('INVALID CONTACTS', invalidContacts)
   }
-})()
+}
+
+module.exports = bulkImessage

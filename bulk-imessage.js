@@ -5,10 +5,12 @@
  *
  * @requires fs
  * @requires osa-imessage
+ * @requires createThread.js
  */
 
 const fs = require('fs')
 const imessage = require('./osa-imessage')
+const { createThread, sendSms } = require('./createThread')
 
 /**
  * get contacts
@@ -19,7 +21,7 @@ const getContacts = filePath => {
   const contacts = txt
     .split('\n')
     .filter(row => row.length)
-    .map(contact => contact.trim())
+    .map(contact => contact.replace(/\s+/g, '').trim())
   return contacts
 }
 
@@ -32,18 +34,63 @@ const sendMessage = async ({
   isFile = false,
   retries = 1,
   retryCount = 0,
+  newThread = false,
+  sms = false,
 }) => {
   try {
-    await imessage.send({
-      handle: contact,
-      message,
-      isFile,
-    })
+    if (newThread) {
+      console.log('creating thread...')
+      await createThread(contact)
+    }
+    if (sms || newThread) {
+      console.log('sleep')
+      await sleep(1000)
+    }
+
+    if (sms && !isFile) {
+      console.log('sending sms')
+      await sendSms(contact, message)
+    } else {
+      console.log('sending imessage')
+      await imessage.send({
+        handle: contact,
+        message,
+        isFile,
+      })
+    }
   } catch (error) {
     if (retryCount < retries) {
-      console.log(`${contact} failed. retrying...`)
       retryCount++
-      await sendMessage({ contact, message, isFile, retries, retryCount })
+      await sendMessage({
+        contact,
+        message,
+        isFile,
+        retries,
+        retryCount,
+        newThread,
+        sms,
+      })
+    } else if (retryCount === retries && !isFile) {
+      // try again creating a thread
+      retryCount++
+      await sendMessage({
+        contact,
+        message,
+        retries,
+        retryCount,
+        newThread: true,
+      })
+    } else if (retryCount === retries + 1 && !isFile) {
+      // try again creating a thread
+      retryCount++
+      await sendMessage({
+        contact,
+        message,
+        retries,
+        retryCount,
+        newThread: true,
+        sms: true,
+      })
     } else {
       throw error
     }
@@ -60,6 +107,7 @@ const uniqueArr = list =>
 const bulkImessage = async ({ messages, contactsPath = './contacts.txt' }) => {
   // retrieve contacts
   const contacts = getContacts(contactsPath)
+
   let invalidContacts = []
 
   // send message per contact
@@ -68,6 +116,7 @@ const bulkImessage = async ({ messages, contactsPath = './contacts.txt' }) => {
       try {
         await sendMessage({ contact, ...msg })
       } catch (error) {
+        console.error(error.message)
         console.log('invalid contact', contact)
         invalidContacts.push(contact)
       }
@@ -85,3 +134,7 @@ const bulkImessage = async ({ messages, contactsPath = './contacts.txt' }) => {
 }
 
 module.exports = bulkImessage
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

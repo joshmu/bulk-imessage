@@ -40,6 +40,7 @@ const sendMessageOrFile = (handle, messageOrFilepath, isFile) => {
 
     try {
       target = Messages.buddies.whose({ handle: handle })[0]
+      throw target
     } catch (e) {}
 
     try {

@@ -16,6 +16,7 @@
   "author": "josh mu",
   "license": "MIT",
   "dependencies": {
+    "applescript": "^1.0.0",
     "is-valid-path": "^0.1.1",
     "osa2": "^0.2.3"
   }

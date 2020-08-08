@@ -30,6 +30,8 @@ At the project root:
 
 ## Usage
 
+`npm run bulk-imessage` OR `npm run bulk-sms`
+
 Import `bulkImessage` and pass a list of messages you would like to send to each phone number provided (_Refer to example.js_). Optionally specifiy the `contactsPath`. Otherwise simply initialise the `example.js` provided at the project root.
 
 Modify _contacts.txt_ with a phone number per line (inlcude country code prefix, eg. **+61**). Also replace the _attachement.gif_ with your own otherwise if using a different attachement then make sure to mention the path when initialising.
@@ -38,3 +40,7 @@ At the project root folder:
 `node ./example.js` or `npm start`
 
 If you have invalid contacts a **invalidContacts.txt** file will be generated at the root.
+
+### SMS
+
+Using SMS all files are prefixed with _sms\__

@@ -3,6 +3,7 @@
  */
 
 const applescript = require('applescript')
+const fs = require('fs')
 const path = require('path')
 
 /**
@@ -61,7 +62,7 @@ const createNewThread = (contact, message) => {
  * @param {string} contact - phone number (inc country code)
  * @param {string} filePath - attachment relative file path
  */
-const sendSmsAttachment = (contact, filePath) => {
+const sendSmsAttachment = (contact, filePath = './attachment.gif') => {
   console.log('send attachment')
   return new Promise((resolve, reject) => {
     const script = `
@@ -86,33 +87,73 @@ const sendSmsAttachment = (contact, filePath) => {
   })
 }
 
-;(async () => {
-  try {
-    // 1
-    const res = await createNewThread('+61481304509', '- GIF OF DANCE -')
-    console.log({ res })
+const bulkSMS = async ({ messages, contactsPath = './sms_contacts.txt' }) => {
+  // retrieve contacts
+  const contacts = getContacts(contactsPath)
 
-    // 2
-    const res2 = await sendSmsAttachment('+61481304509', 'attachment.gif')
-    console.log({ res2 })
+  let invalidContacts = []
 
-    await sleep(5000)
-
-    // 3
-    const res3 = await sendSms('+61481304509', 'END ⚡️')
-    console.log({ res3 })
-  } catch (error) {
-    console.error(error)
+  // send message per contact
+  for (let contact of contacts) {
+    let messageCount = 0
+    for (let msg of messages) {
+      messageCount++
+      try {
+        if (messageCount === 1) {
+          await createNewThread(contact, msg.message)
+        }
+        if (msg.isFile) {
+          await sendSmsAttachment(contact, (msg.message = './attachment.gif'))
+          if (msg.wait) await sleep(+msg.wait * 1000)
+        } else {
+          await sendSms(contact, msg.message)
+        }
+      } catch (error) {
+        console.error(error.message)
+        console.log('invalid contact', contact)
+        invalidContacts.push(contact)
+      }
+    }
   }
-})()
+
+  // display any errors
+  if (invalidContacts.length) {
+    // only unique
+    invalidContacts = uniqueArr(invalidContacts)
+
+    fs.writeFileSync('./sms_invalidContacts.txt', invalidContacts.join('\n'))
+    console.error('INVALID CONTACTS', invalidContacts)
+  }
+}
 
 module.exports = {
   sendSms,
   createNewThread,
   sendSmsAttachment,
+  bulkSMS,
 }
 
 // Helper
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/**
+ * return list of unique items
+ * @param {string[]} list
+ */
+const uniqueArr = list =>
+  list.filter((item, index, self) => self.indexOf(item) === index)
+
+/**
+ * get contacts
+ * @param {string} filePath file path
+ */
+const getContacts = filePath => {
+  const txt = fs.readFileSync(filePath, 'utf8')
+  const contacts = txt
+    .split('\n')
+    .filter(row => row.length)
+    .map(contact => contact.replace(/\s+/g, '').trim())
+  return contacts
 }

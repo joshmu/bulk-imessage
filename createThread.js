@@ -5,12 +5,13 @@ const createThread = async (contact, message = '.') => {
     // create a new thread before sending message
     const script = `activate application "Messages"
    tell application "System Events" to tell process "Messages"
-   key code 45 using command down           -- press Command + N to start a new window
-   keystroke "${contact}"  -- input the phone number
-   key code 36                              -- press Enter to focus on the message area 
-   keystroke "${message}"       -- type some message
-   key code 36                              -- press Enter to send
-end tell
+      key code 45 using command down           -- press Command + N to start a new window
+      keystroke "${contact}"  -- input the phone number
+      key code 36                              -- press Enter to focus on the message area 
+      delay 1
+      keystroke "${message}"       -- type some message
+      key code 36                              -- press Enter to send
+    end tell
 `
     applescript.execString(script, (err, rtn) => {
       if (err) console.error(err)

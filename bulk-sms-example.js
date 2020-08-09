@@ -6,7 +6,7 @@ const { bulkSMS } = require('./sms')
 
 const MESSAGES_TO_SEND = [
   {
-    // no emojies allowed if we are creating threads
+    // no emojis allowed if we are creating threads
     message: '- GIF OF DANCE -',
   },
   {

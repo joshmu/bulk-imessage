@@ -40,23 +40,19 @@ const sendMessage = async ({
   try {
     if (newThread) {
       console.log('creating thread...')
-      await createThread(contact)
-    }
-    if (sms || newThread) {
-      console.log('sleep')
-      await sleep(1000)
-    }
-
-    if (sms && !isFile) {
-      console.log('sending sms')
-      await sendSms(contact, message)
+      await createThread(contact, message)
     } else {
-      console.log('sending imessage')
-      await imessage.send({
-        handle: contact,
-        message,
-        isFile,
-      })
+      if (sms && !isFile) {
+        console.log('sending sms')
+        await sendSms(contact, message)
+      } else {
+        console.log('sending imessage')
+        await imessage.send({
+          handle: contact,
+          message,
+          isFile,
+        })
+      }
     }
   } catch (error) {
     if (retryCount < retries) {
@@ -112,9 +108,11 @@ const bulkImessage = async ({ messages, contactsPath = './contacts.txt' }) => {
 
   // send message per contact
   for (let contact of contacts) {
+    let msgCount = 0
     for (let msg of messages) {
+      msgCount++
       try {
-        await sendMessage({ contact, ...msg })
+        await sendMessage({ contact, ...msg, newThread: msgCount === 1 })
       } catch (error) {
         console.error(error.message)
         console.log('invalid contact', contact)

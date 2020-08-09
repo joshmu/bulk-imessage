@@ -4,9 +4,8 @@
   "description": "Send imessages to multiple users.",
   "main": "bulk-imessage.js",
   "scripts": {
-    "start": "node example.js",
-    "bulk-imessage": "node example.js",
-    "bulk-sms": "node bulk-sms.js"
+    "bulk-imessage": "node bulk-imessage-example.js",
+    "bulk-sms": "node bulk-sms-example.js"
   },
   "keywords": [
     "imessage",

@@ -46,6 +46,7 @@ const createNewThread = (contact, message) => {
         key code 45 using command down           -- press Command + N to start a new window
         keystroke "${contact}"  -- input the phone number
         key code 36                              -- press Enter to focus on the message area 
+        delay 1
         keystroke "${message}"       -- type some message
         key code 36                              -- press Enter to send
       end tell
@@ -101,8 +102,7 @@ const bulkSMS = async ({ messages, contactsPath = './sms_contacts.txt' }) => {
       try {
         if (messageCount === 1) {
           await createNewThread(contact, msg.message)
-        }
-        if (msg.isFile) {
+        } else if (msg.isFile) {
           await sendSmsAttachment(contact, (msg.message = './attachment.gif'))
           if (msg.wait) await sleep(+msg.wait * 1000)
         } else {

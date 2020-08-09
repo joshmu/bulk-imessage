@@ -2,7 +2,7 @@
  *  Bulk send SMS
  */
 
-const { bulkSMS } = require('./sms')
+const { bulkSMS } = require('./lib/sms')
 
 const MESSAGES_TO_SEND = [
   {

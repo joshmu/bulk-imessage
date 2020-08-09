@@ -2,11 +2,12 @@
  * Example of how to use bulk-imessage
  */
 
-const bulkImessage = require('./bulk-imessage')
+const bulkImessage = require('./lib/bulk-imessage')
 
 const MESSAGES_TO_SEND = [
   {
-    message: 'first message ⚡️',
+    // you cannot use an emoji for the first message
+    message: 'first message️',
   },
   {
     message: './attachment.gif',
